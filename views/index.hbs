@@ -1,9 +1,13 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-	var socket = io('//'+document.location.hostname+':'+document.location.port);
-	socket.on('socketToMe', function (data) {
-	  console.log(data);
-	});
-</script>
+<div id="chat">
+  <ul>
+    <li v-for="message in messages">{{ message }}</li>
+  </ul>
+  
+  <form v-on:keyup.enter="newMessage">
+    <textarea v-model="myMessage"></textarea>
+    <button type="button" v-on:click="newMessage">Send</button>
+    <button v-on:click="deleteMessages">Delete All</button>
+  </form>
+</div>
