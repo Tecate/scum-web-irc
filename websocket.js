@@ -32,8 +32,13 @@ exports = module.exports = function(io){
 				io.emit("message", {nick: nickName, text: text});
 			});
 
+			socket.on('nick', function(data){
+				nick = data;
+				client.say("/nick" + nick);
+			});
+
 			socket.on('message', function(data){
-				console.log(client.nick + ": " +data);
+				console.log(client.nick + ": " + data);
 				client.say(channel, data);
 			});
 

@@ -1,13 +1,7 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
 <div id="chat">
-  <ul>
-    <li v-for="message in messages">{{ message }}</li>
-  </ul>
-  
-  <form v-on:keyup.enter="newMessage">
-    <textarea v-model="myMessage"></textarea>
-    <button type="button" v-on:click="newMessage">Send</button>
-    <button v-on:click="deleteMessages">Delete All</button>
-  </form>
+	<pre id="chat-log"></pre>
+    <input id="input" type="text" placeholder="say something">
+    <input id="nick" type="text" placeholder="nickname">
 </div>
