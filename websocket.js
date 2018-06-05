@@ -14,6 +14,10 @@ exports = module.exports = function(io){
 			autoConnect: false
 		});
 
+		// client.addListener('raw', function(message) {
+		//     console.log(message);
+		// });
+
 		client.addListener('error', function(message) {
 		    console.log('error: ', message);
 		});
@@ -23,20 +27,15 @@ exports = module.exports = function(io){
 		    io.emit("whois", message);
 		});
 
+		client.addListener('message', function(nickName, to, text, message) {
+			console.log(nickName + ": " + text);
+			io.emit("message", {nick: nickName, text: text});
+		});
+
 		client.connect(function() {
-
-			// client.addListener('raw', function(message) {
-			//     console.log(message);
-			// });
-
 			client.join(channel, function(){
 				client.say(channel, "I'm a bot!");
 				connected = true;
-			})
-
-			client.addListener('message', function(nickName, to, text, message) {
-				console.log(nickName + ": " + text);
-				io.emit("message", {nick: nickName, text: text});
 			});
 
 			socket.on('nick', function(data){
@@ -49,7 +48,9 @@ exports = module.exports = function(io){
 					command = data.substring(1);
 					command = command.split(" ");
 					console.log(command);
-					client.send(...command);
+					if (allowedCommands.includes(command[0])) {
+						client.send(...command);
+					}
 				} else {
 					client.say(channel, data);
 				}
