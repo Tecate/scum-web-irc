@@ -5,18 +5,34 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   	<script src="/socket.io/socket.io.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
 
   </head>
   <body>
     <div id="chat">
       <li v-for="message in messages">
-        <span class="user" v-if="message.nick != ''">{{ message.nick }}:</span>
-        <span class="message-contents">{{ message.text }}</span>
+        <span class="whois" v-if="message.type === 'whois'">WHOIS {{ message.nick }}
+          <pre>host     : {{ message.user + "@" + message.host }}</pre>
+          <pre>real name: {{ message.realname }}</pre>
+          <pre>channels : {{ message.channels }}</pre>
+          <pre>idle     : {{ message.idle }}</pre>
+        </span>
+
+        <span class="action" v-if="message.type == 'action'">{{ message.nick + " " + message.text }}</span>
+        
+        <pre class="motd" v-if="message.type == 'motd'">{{ message.text }}</pre>
+
+        <span class="topic" v-if="message.type == 'topic'">{{ message.text }}</span>
+
+        <span class="pm user" v-if="message.type == 'pm'">PM {{ message.nick }}:</span>
+        <span class="pm message-contents" v-if="message.type == 'pm'">{{ message.text }}</span>
+
+        <span class="user" v-if="message.type == 'message'">{{ message.nick }}:</span>
+        <span class="message-contents" v-if="message.type == 'message'">{{ message.text }}</span>
       </li>
       
-        <input type="text" v-on:keydown.enter="newMessage" v-model="myMessage" placeholder="say something">
-        <button v-on:click="deleteMessages">Delete All</button>
+      <input type="text" v-on:keydown.enter="newMessage" v-model="myMessage" placeholder="say something">
+      <button v-on:click="deleteMessages">Delete All</button>
     </div>
         <script src="/js/main-vue.js"></script>
   </body>

@@ -83,9 +83,9 @@ exports = module.exports = function(io){
 		    io.emit("-mode", message);
 		});
 
-		client.addListener('action', function(from, to, text, message) {
+		client.addListener('action', function(nick, to, text, message) {
 		    console.log("action: ", message);
-		    io.emit("action", { from: from, text: text });
+		    io.emit("action", { nick: nick, text: text });
 		});
 
 		// whois sends on connect but we don't want to send first whois event
@@ -94,6 +94,11 @@ exports = module.exports = function(io){
 		    console.log("whois: ", data);
 		    if (whoisCount > 0) { io.emit("whois", data); }
 		    whoisCount++;
+		});
+
+		client.addListener('selfMessage', function(to, text) {
+			console.log(to + ": " + text);
+			io.emit("selfMessage", {nick: client.nick, to: to, text: text});
 		});
 
 		client.addListener('message', function(nickName, to, text, message) {

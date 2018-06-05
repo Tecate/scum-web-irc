@@ -16,7 +16,7 @@ const app = new Vue({
       e.preventDefault();
       socket.emit('message', this.myMessage);
       this.sentMessages.push(this.myMessage);
-      this.messages.push({ nick: this.nick, text: this.myMessage });
+      // this.messages.push({ type: 'message', nick: this.nick, text: this.myMessage });
       this.myMessage = '';
     },
     deleteMessages(e) {
@@ -29,37 +29,52 @@ const app = new Vue({
 
 socket.on('message', function (data) {
   console.log(data);
+  data.type = 'message';
   app.messages.push(data);
   // $("#chat-log").append(data.nick + ": " + data.text + "\n");
 });
 
+socket.on('selfMessage', function (data) {
+  console.log(data);
+  if (data.text.startsWith("\u0001ACTION")) {
+    data.type = 'action';
+    data.text = data.text.substring(8);
+  } else {
+    data.type = 'message';
+  }
+  app.messages.push(data);
+});
+
 socket.on('whois', function (data) {
   console.log(data);
-  // $("#chat-log").append("WHOIS " + data.nick + ": " + "\n"
-  // 						+ "host: " + data.host + "\n"
-  // 						+ "realname: " + data.realname + "\n"
-  // 						+ "channels: " + data.channels + "\n"
-  // 						+ "idle: " + data.idle + "\n"
-  // 						);
+  data.channels = data.channels.join(', ');
+  data.type = 'whois';
+  app.messages.push(data);
 });
 
-socket.on('motd', function (data) {
-  console.log(data);
-  // $("#chat-log").append(data);
+socket.on('motd', function (motd) {
+  console.log(motd);
+  var data = { type: 'motd', text: motd }
+  app.messages.push(data);
 });
 
-socket.on('topic', function (data) {
-  console.log(data);
-  // $("#chat-log").append(data);
+socket.on('topic', function (topic) {
+  console.log(topic);
+  var data = { type: 'topic', text: topic }
+  app.messages.push(data);
 });
 
 socket.on('pm', function (data) {
   console.log(data);
+  data.type = 'pm';
+  app.messages.push(data);
   // $("#chat-log").append("PM from " + data.nick + ": " + data.text);
 });
 
 socket.on('action', function (data) {
   console.log(data);
+  data.type = 'action';
+  app.messages.push(data);
   // $("#chat-log").append(data.from + " " + data.text);
 });
 
