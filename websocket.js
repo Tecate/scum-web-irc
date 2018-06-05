@@ -1,9 +1,9 @@
 var irc = require('irc');
 
-var channel = '#testing';
+var channel = '#testing3';
 var connected = false;
 
-var allowedCommands = ["me", "whois", "motd", "topic", "msg"];
+var allowedCommands = ["me", "whois", "motd", "topic", "msg", "nick"];
 
 exports = module.exports = function(io){
 	io.on('connection', function(socket){
@@ -123,6 +123,8 @@ exports = module.exports = function(io){
 						} else if (command[0] === "topic") {
 							console.log(client.chans[channel].topic);
 							io.emit('topic', client.chans[channel].topic);
+						} else if (command[0] === "nick") {
+							client.send('nick', command[1]);
 						} else if (command[0] === "msg") {
 							client.say(command[1], command.slice(2, command.length).join(" "))
 						} else {

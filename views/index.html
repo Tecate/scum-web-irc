@@ -4,14 +4,20 @@
     <title>scum irc client</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   	<script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  	<script src="/js/main.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+
   </head>
   <body>
     <div id="chat">
-      <pre id="chat-log"></pre>
-        <input id="input" type="text" placeholder="say something">
-        <input id="nick" type="text" placeholder="nickname">
+      <li v-for="message in messages">
+        <span class="user" v-if="message.nick != ''">{{ message.nick }}:</span>
+        <span class="message-contents">{{ message.text }}</span>
+      </li>
+      
+        <input type="text" v-on:keydown.enter="newMessage" v-model="myMessage" placeholder="say something">
+        <button v-on:click="deleteMessages">Delete All</button>
     </div>
+        <script src="/js/main-vue.js"></script>
   </body>
 </html>
