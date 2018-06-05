@@ -1,6 +1,6 @@
 var irc = require('irc');
 
-var channel = '#testing';
+var channel = '#general';
 var connected = false;
 
 var allowedCommands = ["me", "whois", "motd", "topic", "msg"];
@@ -9,7 +9,11 @@ exports = module.exports = function(io){
 	io.on('connection', function(socket){
 		console.log('websocket established');
 
+		var remoteAddress = socket.request.connection.remoteAddress;
+
 		var client = new irc.Client('scum.systems', 'nodebot', {
+			userName: "test", // should be remoteAddress
+			realName: 'nodebot',
 			port: '6697',
 			secure: true,
 			channels: [channel],
@@ -20,27 +24,27 @@ exports = module.exports = function(io){
 		//     console.log(message);
 		// });
 
-		client.addListener('error', function(message) {
-		    console.log('error: ', message);
+		client.addListener('error', function(data) {
+		    console.log('error: ', data);
 		});
 
-		client.addListener('motd', function(motd) {
-		    console.log("motd: ", motd);
-		    io.emit("motd", motd);
+		client.addListener('motd', function(data) {
+		    console.log("motd: ", data);
+		    io.emit("motd", data);
 		});
 
-		client.addListener('names'+channel, function(nicks) {
-		    console.log("names: ", nicks);
-		    io.emit("names", nicks);
+		client.addListener('names'+channel, function(data) {
+		    console.log("names: ", data);
+		    io.emit("names", data);
 		});
 
 		client.addListener('topic', function(channel, topic, nick, message) {
-		    console.log("topic: ", topic);
+		    console.log("topic: ", message);
 		    io.emit("topic", topic);
 		});
 
 		client.addListener('notify', function(nick, to, text, message) {
-		    console.log("notify: ", text);
+		    console.log("notify: ", message);
 		    io.emit("notify", text);
 		});
 
@@ -61,7 +65,7 @@ exports = module.exports = function(io){
 
 		client.addListener('pm', function(nick, text, message) {
 		    console.log("pm: ", message);
-		    io.emit("pm", message);
+		    io.emit("pm", { nick: nick, text: text });
 		});
 
 		client.addListener('nick', function(oldnick, newnick, channels, message) {
@@ -81,13 +85,14 @@ exports = module.exports = function(io){
 
 		client.addListener('action', function(from, to, text, message) {
 		    console.log("action: ", message);
-		    io.emit("action", message);
+		    io.emit("action", { from: from, text: text });
 		});
 
+		// whois sends on connect but we don't want to send first whois event
 		var whoisCount = 0;
-		client.addListener('whois', function(info) {
-		    console.log("whois: ", info);
-		    if (whoisCount > 0) { io.emit("whois", info); }
+		client.addListener('whois', function(data) {
+		    console.log("whois: ", data);
+		    if (whoisCount > 0) { io.emit("whois", data); }
 		    whoisCount++;
 		});
 
@@ -115,6 +120,11 @@ exports = module.exports = function(io){
 					if (allowedCommands.includes(command[0])) {
 						if (command[0] === "me") {
 							client.action(channel, command.slice(1, command.length).join(" "));
+						} else if (command[0] === "topic") {
+							console.log(client.chans[channel].topic);
+							io.emit('topic', client.chans[channel].topic);
+						} else if (command[0] === "msg") {
+							client.say(command[1], command.slice(2, command.length).join(" "))
 						} else {
 							client.send(...command);
 						}

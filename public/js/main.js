@@ -40,6 +40,27 @@ socket.on('whois', function (data) {
   						);
 });
 
+socket.on('motd', function (data) {
+  console.log(data);
+  $("#chat-log").append(data);
+});
+
+socket.on('topic', function (data) {
+  console.log(data);
+  $("#chat-log").append(data);
+});
+
+socket.on('pm', function (data) {
+  console.log(data);
+  $("#chat-log").append("PM from " + data.nick + ": " + data.text);
+});
+
+socket.on('action', function (data) {
+  console.log(data);
+  $("#chat-log").append(data.from + " " + data.text);
+});
+
+
 socket.on('connection', function(socket){
   // socket.on('chat message', function(msg){
   //   socket.emit('chat message', msg);
