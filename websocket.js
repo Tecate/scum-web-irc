@@ -1,6 +1,6 @@
 var irc = require('irc');
 
-var channel = '#general';
+var channel = '#testing';
 var connected = false;
 
 var allowedCommands = ["me", "whois", "motd", "topic", "msg"];
