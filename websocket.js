@@ -1,6 +1,6 @@
 var irc = require('irc');
 
-var channel = '#testing2';
+var channel = '#testing';
 var connected = false;
 
 var allowedCommands = ["me", "whois", "motd", "topic", "msg"];
@@ -35,12 +35,12 @@ exports = module.exports = function(io){
 		});
 
 		client.addListener('topic', function(channel, topic, nick, message) {
-		    console.log(topic);
+		    console.log("topic: ", topic);
 		    io.emit("topic", topic);
 		});
 
 		client.addListener('notify', function(nick, to, text, message) {
-		    console.log(text);
+		    console.log("notify: ", text);
 		    io.emit("notify", text);
 		});
 
@@ -55,38 +55,40 @@ exports = module.exports = function(io){
 		});
 
 		client.addListener('kick'+channel, function(nick, by, reason, message) {
-		    console.log(message);
+		    console.log("kick: ", message);
 		    io.emit("kick", message);
 		});
 
 		client.addListener('pm', function(nick, text, message) {
-		    console.log(message);
+		    console.log("pm: ", message);
 		    io.emit("pm", message);
 		});
 
 		client.addListener('nick', function(oldnick, newnick, channels, message) {
-		    console.log(message);
+		    console.log("nick: ", message);
 		    io.emit("nick", message);
 		});
 
 		client.addListener('+mode', function(channel, by, mode, argument, message) {
-		    console.log(message);
+		    console.log("+mode: ", message);
 		    io.emit("+mode", message);
 		});
 
 		client.addListener('-mode', function(channel, by, mode, argument, message) {
-		    console.log(message);
+		    console.log("-mode: ", message);
 		    io.emit("-mode", message);
 		});
 
 		client.addListener('action', function(from, to, text, message) {
-		    console.log(message);
+		    console.log("action: ", message);
 		    io.emit("action", message);
 		});
 
+		var whoisCount = 0;
 		client.addListener('whois', function(info) {
 		    console.log("whois: ", info);
-		    io.emit("whois", info);
+		    if (whoisCount > 0) { io.emit("whois", info); }
+		    whoisCount++;
 		});
 
 		client.addListener('message', function(nickName, to, text, message) {
@@ -111,7 +113,11 @@ exports = module.exports = function(io){
 					command = data.substring(1).split(" ");
 					console.log(command);
 					if (allowedCommands.includes(command[0])) {
-						client.send(...command);
+						if (command[0] === "me") {
+							client.action(channel, command.slice(1, command.length).join(" "));
+						} else {
+							client.send(...command);
+						}
 					}
 				} else {
 					client.say(channel, data);
