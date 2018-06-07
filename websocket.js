@@ -99,7 +99,7 @@ exports = module.exports = function(io){
 		client.addListener('selfMessage', function(to, text) {
 			console.log("selfMessage " + to + ": " + text);
 			if (to != channel) {
-				io.emit("selfMessage", {nick: client.nick, to: to, text: text, pm: true});
+				io.emit("selfMessage", {from: client.nick, to: to, text: text, pm: true});
 			} else {
 				io.emit("selfMessage", {nick: client.nick, to: to, text: text, pm: false});
 			}
@@ -109,7 +109,7 @@ exports = module.exports = function(io){
 			// console.log(nickName + ": " + text);
 			console.log("message " + message.command);
 			if (message.args[0] === client.nick) {
-				io.emit("message", {nick: nickName, text: text, pm: true });
+				io.emit("message", {from: nickName, to: client.nick, text: text, pm: true });
 			} else {
 				io.emit("message", {nick: nickName, text: text, pm: false });
 			}
