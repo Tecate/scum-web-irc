@@ -22,9 +22,13 @@
         
         <pre class="motd" v-if="message.type == 'motd'">{{ message.text }}</pre>
 
-        <span class="topic" v-if="message.type == 'topic'">{{ message.text }}</span>
+        <span class="topic" v-if="message.type == 'topic'">{{ message.nick }} has changed topic for {{ message.args[0] }} to "{{ message.args[1] }}"</span>
+        <span class="initialTopic" v-if="message.type == 'initialTopic'"> Topic for {{ message.args[1] }} is "{{ message.topic }}" set by  {{ message.args[2].substring(0, message.args[2].indexOf("!")) }}</span>
 
-        <span class="topic" v-if="message.type == 'error'">Error: {{ message.text }}</span>
+        <span class="join" v-if="message.type == 'join'">{{ message.nick }} ({{ message.user }}@{{ message.host }}) has joined {{ message.args[0] }}</span>
+        <span class="part" v-if="message.type == 'part'">{{ message.nick }} ({{ message.user }}@{{ message.host }}) has left {{ message.args[0] }} ({{ message.args[1] }})</span>
+
+        <span class="error" v-if="message.type == 'error'">Error: {{ message.text }}</span>
 
         <span class="pm user" v-if="message.type == 'pm'">PM {{ message.from }} > {{ message.to }}:</span>
         <span class="pm message-contents" v-if="message.type == 'pm'">{{ message.text }}</span>

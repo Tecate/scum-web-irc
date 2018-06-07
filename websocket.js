@@ -3,7 +3,7 @@ var irc = require('irc');
 var channel = '#testing3';
 var connected = false;
 
-var allowedCommands = ["me", "whois", "motd", "topic", "msg", "nick"];
+var allowedCommands = ["me", "whois", "motd", "topic", "msg", "nick", "names"];
 
 exports = module.exports = function(io){
 	io.on('connection', function(socket){
@@ -24,11 +24,13 @@ exports = module.exports = function(io){
 		//     console.log(message);
 		// });
 
+		// good clientside
 		client.addListener('error', function(data) {
 		    console.log('error: ', data);
 		    io.emit("error", data.args[2]);
 		});
 
+		// good clientside
 		client.addListener('motd', function(data) {
 		    console.log("motd: ", data);
 		    io.emit("motd", data);
@@ -41,7 +43,8 @@ exports = module.exports = function(io){
 
 		client.addListener('topic', function(channel, topic, nick, message) {
 		    console.log("topic: ", message);
-		    io.emit("topic", topic);
+		    message.topic = topic;
+		    io.emit("topic", message);
 		});
 
 		client.addListener('notify', function(nick, to, text, message) {
@@ -49,11 +52,13 @@ exports = module.exports = function(io){
 		    io.emit("notify", text);
 		});
 
+		// good clientside
 		client.addListener('join'+channel, function(nick, message) {
 		    console.log("joined: ", message);
 		    io.emit("join", message);
 		});
 
+		// good clientside
 		client.addListener('part'+channel, function(nick, reason, message) {
 		    console.log("part: ", message);
 		    io.emit("part", message);
@@ -64,10 +69,11 @@ exports = module.exports = function(io){
 		    io.emit("kick", message);
 		});
 
-		client.addListener('pm', function(nick, text, message) {
-		    console.log("pm: ", message);
-		    io.emit("pm", { nick: nick, text: text });
-		});
+		// good clientside
+		// client.addListener('pm', function(nick, text, message) {
+		//     console.log("pm: ", message);
+		//     io.emit("pm", { nick: nick, text: text });
+		// });
 
 		client.addListener('nick', function(oldnick, newnick, channels, message) {
 		    console.log("nick: ", message);
@@ -84,11 +90,13 @@ exports = module.exports = function(io){
 		    io.emit("-mode", message);
 		});
 
+		// good clientside
 		client.addListener('action', function(nick, to, text, message) {
 		    console.log("action: ", message);
 		    io.emit("action", { nick: nick, text: text });
 		});
 
+		// good clientside
 		// whois sends on connect but we don't want to send first whois event
 		var whoisCount = 0;
 		client.addListener('whois', function(data) {
@@ -97,6 +105,7 @@ exports = module.exports = function(io){
 		    whoisCount++;
 		});
 
+		// good clientside
 		client.addListener('selfMessage', function(to, text) {
 			console.log("selfMessage " + to + ": " + text);
 			if (to != channel) {
@@ -106,6 +115,7 @@ exports = module.exports = function(io){
 			}
 		});
 
+		// good clientside
 		client.addListener('message', function(nickName, to, text, message) {
 			// console.log(nickName + ": " + text);
 			console.log("message " + message.command);
@@ -141,7 +151,10 @@ exports = module.exports = function(io){
 						} else if (command[0] === "nick") {
 							client.send('nick', command[1]);
 						} else if (command[0] === "msg") {
-							client.say(command[1], command.slice(2, command.length).join(" "))
+							client.say(command[1], command.slice(2, command.length).join(" "));
+						} else if (command[0] === "names") {
+							console.log("command names");
+							client.send('names #testing3');
 						} else {
 							client.send(...command);
 						}

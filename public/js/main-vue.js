@@ -64,9 +64,13 @@ socket.on('motd', function (motd) {
   app.messages.push(data);
 });
 
-socket.on('topic', function (topic) {
-  console.log(topic);
-  var data = { type: 'topic', text: topic }
+socket.on('topic', function (data) {
+  console.log(data);
+  if (data.commandType === "reply") {
+    data.type = 'initialTopic';
+  } else {
+    data.type = 'topic';
+  }
   app.messages.push(data);
 });
 
@@ -76,6 +80,18 @@ socket.on('topic', function (topic) {
 //   app.messages.push(data);
 //   // $("#chat-log").append("PM from " + data.nick + ": " + data.text);
 // });
+
+socket.on('join', function (data) {
+  console.log(data);
+  data.type = 'join';
+  app.messages.push(data);
+});
+
+socket.on('part', function (data) {
+  console.log(data);
+  data.type = 'part';
+  app.messages.push(data);
+});
 
 socket.on('action', function (data) {
   console.log(data);
