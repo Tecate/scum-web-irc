@@ -26,6 +26,7 @@ exports = module.exports = function(io){
 
 		client.addListener('error', function(data) {
 		    console.log('error: ', data);
+		    io.emit("error", data.args[2]);
 		});
 
 		client.addListener('motd', function(data) {

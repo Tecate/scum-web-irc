@@ -84,6 +84,11 @@ socket.on('action', function (data) {
   // $("#chat-log").append(data.from + " " + data.text);
 });
 
+socket.on('error', function (error) {
+  console.log(data);
+  var data = { type: 'error', text: error }
+  app.messages.push(data);
+});
 
 socket.on('connection', function(socket){
   // socket.on('chat message', function(msg){

@@ -24,9 +24,9 @@
 
         <span class="topic" v-if="message.type == 'topic'">{{ message.text }}</span>
 
+        <span class="topic" v-if="message.type == 'error'">Error: {{ message.text }}</span>
+
         <span class="pm user" v-if="message.type == 'pm'">PM {{ message.from }} > {{ message.to }}:</span>
-        <!-- PM nodebot from hskel -->
-        <!-- PM hskel from nodebot -->
         <span class="pm message-contents" v-if="message.type == 'pm'">{{ message.text }}</span>
 
         <span class="user" v-if="message.type == 'message'">{{ message.nick }}:</span>
