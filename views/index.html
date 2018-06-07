@@ -24,7 +24,7 @@
 
         <span class="topic" v-if="message.type == 'topic'">{{ message.text }}</span>
 
-        <span class="pm user" v-if="message.type == 'pm'">PM {{ message.nick }}:</span>
+        <span class="pm user" v-if="message.type == 'pm'">PM {{ message.nick }} {{ message.to }}:</span>
         <span class="pm message-contents" v-if="message.type == 'pm'">{{ message.text }}</span>
 
         <span class="user" v-if="message.type == 'message'">{{ message.nick }}:</span>

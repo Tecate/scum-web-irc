@@ -28,8 +28,12 @@ const app = new Vue({
 
 
 socket.on('message', function (data) {
-  console.log(data);
-  data.type = 'message';
+  console.log("message", data);
+  if (data.pm) {
+    data.type = 'pm';
+  } else {
+    data.type = 'message';
+  }
   app.messages.push(data);
   // $("#chat-log").append(data.nick + ": " + data.text + "\n");
 });
@@ -39,6 +43,8 @@ socket.on('selfMessage', function (data) {
   if (data.text.startsWith("\u0001ACTION")) {
     data.type = 'action';
     data.text = data.text.substring(8);
+  } else if (data.pm) {
+    data.type = 'pm';
   } else {
     data.type = 'message';
   }
@@ -64,12 +70,12 @@ socket.on('topic', function (topic) {
   app.messages.push(data);
 });
 
-socket.on('pm', function (data) {
-  console.log(data);
-  data.type = 'pm';
-  app.messages.push(data);
-  // $("#chat-log").append("PM from " + data.nick + ": " + data.text);
-});
+// socket.on('pm', function (data) {
+//   console.log("pm ", data);
+//   data.type = 'pm';
+//   app.messages.push(data);
+//   // $("#chat-log").append("PM from " + data.nick + ": " + data.text);
+// });
 
 socket.on('action', function (data) {
   console.log(data);

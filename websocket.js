@@ -97,13 +97,22 @@ exports = module.exports = function(io){
 		});
 
 		client.addListener('selfMessage', function(to, text) {
-			console.log(to + ": " + text);
-			io.emit("selfMessage", {nick: client.nick, to: to, text: text});
+			console.log("selfMessage " + to + ": " + text);
+			if (to != channel) {
+				io.emit("selfMessage", {nick: client.nick, to: to, text: text, pm: true});
+			} else {
+				io.emit("selfMessage", {nick: client.nick, to: to, text: text, pm: false});
+			}
 		});
 
 		client.addListener('message', function(nickName, to, text, message) {
-			console.log(nickName + ": " + text);
-			io.emit("message", {nick: nickName, text: text});
+			// console.log(nickName + ": " + text);
+			console.log("message " + message.command);
+			if (message.args[0] === client.nick) {
+				io.emit("message", {nick: nickName, text: text, pm: true });
+			} else {
+				io.emit("message", {nick: nickName, text: text, pm: false });
+			}
 		});
 
 		client.connect(function() {
